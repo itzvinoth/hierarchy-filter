@@ -3,12 +3,14 @@
     <ul v-show="show" class="ul-list">
     	<li v-for="data in nesteddata" @click="handleClick(data, $event)" :key="data.name">
         {{ (data.child_elements && data.child_elements.length && data.status == 'active') ? expand : collapse }}
-        <input type="checkbox" :value="data.name" @click="check($event)" v-model="checkedItems">
+        <input type="checkbox" :value="data.name" @click="checkBoxChecked($event, data.name)" v-model="checkedItems">
         {{ data.name }}
 				<nested-list :key="data.name"
     			v-if="data.child_elements"
     			:nesteddata="data.child_elements"
-    			:displaylist="displayList">
+    			:displaylist="displayList"
+					:selecteditems="selecteditems"
+					@box-checked="valuePassed">
 			</nested-list>
 			</li>
     </ul>
@@ -20,7 +22,8 @@ export default {
   name: 'NestedList',
   props: {
   	nesteddata: Array,
-  	displayList: String
+		displayList: String,
+		selecteditems: Array
   },
   data () {
   	return {
@@ -45,9 +48,13 @@ export default {
 				}
 			}
 		},
-		check: function (event) {
-			if (event.target.checked)
-				console.log(event.target.value)
+		checkBoxChecked: function (event, data) {
+			if (event.target.checked) {
+				this.$emit('box-checked', data)
+			}
+		},
+		valuePassed: function (value) {
+			this.selecteditems.push(value)
 		}
   },
   created: function () {
